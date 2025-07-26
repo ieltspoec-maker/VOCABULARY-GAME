@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS & PTE Vocabulary Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: #f7fafc;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: 600;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .word {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .definition {
+            font-size: 18px;
+            color: #4a5568;
+            margin-bottom: 20px;
+        }
+
+        .example {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 25px;
+        }
+
+        .example-text {
+            font-style: italic;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .option.correct {
+            border-color: #48bb78;
+            background: #f0fff4;
+            color: #22543d;
+        }
+
+        .option.incorrect {
+            border-color: #f56565;
+            background: #fff5f5;
+            color: #742a2a;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .option-letter {
+            font-weight: bold;
+            color: #667eea;
+            margin-right: 10px;
+        }
+
+        .result-message {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .result-badge {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .result-badge.correct {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .result-badge.incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .completion-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .trophy {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .completion-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 30px;
+        }
+
+        .score-summary {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 1px solid #e9ecef;
+        }
+
+        .final-score {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .score-details {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .score-detail {
+            font-size: 18px;
+            color: #4a5568;
+        }
+
+        .score-message {
+            font-size: 20px;
+            font-weight: 600;
+            color: #48bb78;
+            margin-top: 20px;
+        }
+
+        .current-score {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #4a5568;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .title {
+                font-size: 24px;
+            }
+            
+            .word {
+                font-size: 28px;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .stats {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div id="gameContent">
+            <!-- Game content will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        class VocabularyGame {
+            constructor() {
+                this.currentQuestion = 0;
+                this.score = 0;
+                this.selectedAnswer = null;
+                this.showResult = false;
+                this.gameComplete = false;
+                this.streak = 0;
+                this.bestStreak = 0;
+
+                this.vocabularyQuestions = [
+                    {
+                        word: "Substantial",
+                        definition: "Choose the correct meaning:",
+                        options: ["Small and insignificant", "Large in amount or degree", "Related to substances", "Temporary"],
+                        correct: 1,
+                        sentence: "The company made substantial improvements to their service quality.",
+                        category: "Academic"
+                    },
+                    {
+                        word: "Comprise",
+                        definition: "Choose the correct meaning:",
+                        options: ["To compress", "To consist of or include", "To compare", "To compromise"],
+                        correct: 1,
+                        sentence: "The committee comprises five senior members from different departments.",
+                        category: "Academic"
+                    },
+                    {
+                        word: "Prevalent",
+                        definition: "Choose the correct meaning:",
+                        options: ["Previous", "Widespread or common", "Preventable", "Precious"],
+                        correct: 1,
+                        sentence: "Smartphone usage is prevalent among teenagers worldwide.",
+                        category: "Academic"
+                    },
+                    {
+                        word: "Inevitable",
+                        definition: "Choose the correct meaning:",
+                        options: ["Avoidable", "Certain to happen", "Invisible", "Incredible"],
+                        correct: 1,
+                        sentence: "Climate change makes rising sea levels almost inevitable.",
+                        category: "Academic"
+                    },
+                    {
+                        word: "Meticulous",
+                        definition: "Choose the correct meaning:",
+                        options: ["Careless", "Very careful and precise", "Quick", "Mysterious"],
+                        correct: 1,
+                        sentence: "She was meticulous in her research, checking every detail twice.",
+                        category: "Academic"
+                    },
+                    {
+                        word: "Coherent",
+                        definition: "Choose the correct meaning:",
+                        options: ["Confusing", "Logical and consistent", "Colorful", "Complete"],
+                        correct: 1,
+                        sentence: "The student's essay was well-structured and coherent throughout.",
+                        category: "Academic"
+                    },
+                    {
+                        word: "Facilitate",
+                        definition: "Choose the correct meaning:",
+                        options: ["To make difficult", "To make easier or help achieve", "To face", "To fail"],
+                        correct: 1,
+                        sentence: "Technology can facilitate communication between distant countries.",
+                        category: "Academic"
+                    },
+                    {
+                        word: "Ambiguous",
+                        definition: "Choose the correct meaning:",
+                        options: ["Clear and direct", "Having multiple meanings; unclear", "Ambitious", "Amazing"],
+                        correct: 1,
+                        sentence: "The politician's statement was deliberately ambiguous to avoid controversy.",
+                        category: "Academic"
+                    },
+                    {
+                        word: "Deteriorate",
+                        definition: "Choose the correct meaning:",
+                        options: ["To improve", "To become worse", "To determine", "To delete"],
+                        correct: 1,
+                        sentence: "Without proper maintenance, the building's condition will deteriorate rapidly.",
+                        category: "Academic"
+                    },
+                    {
+                        word: "Comprehensive",
+                        definition: "Choose the correct meaning:",
+                        options: ["Compressed", "Complete and thorough", "Complicated", "Competitive"],
+                        correct: 1,
+                        sentence: "The course provides comprehensive coverage of all IELTS skills.",
+                        category: "Academic"
+                    }
+                ];
+
+                this.init();
+            }
+
+            init() {
+                this.render();
+            }
+
+            handleAnswerSelect(answerIndex) {
+                if (this.showResult) return;
+
+                this.selectedAnswer = answerIndex;
+                const isCorrect = answerIndex === this.vocabularyQuestions[this.currentQuestion].correct;
+                
+                if (isCorrect) {
+                    this.score++;
+                    this.streak++;
+                    if (this.streak > this.bestStreak) {
+                        this.bestStreak = this.streak;
+                    }
+                } else {
+                    this.streak = 0;
+                }
+                
+                this.showResult = true;
+                this.render();
+            }
+
+            nextQuestion() {
+                if (this.currentQuestion < this.vocabularyQuestions.length - 1) {
+                    this.currentQuestion++;
+                    this.selectedAnswer = null;
+                    this.showResult = false;
+                } else {
+                    this.gameComplete = true;
+                }
+                this.render();
+            }
+
+            resetGame() {
+                this.currentQuestion = 0;
+                this.score = 0;
+                this.selectedAnswer = null;
+                this.showResult = false;
+                this.gameComplete = false;
+                this.streak = 0;
+                this.render();
+            }
+
+            getScoreMessage() {
+                const percentage = (this.score / this.vocabularyQuestions.length) * 100;
+                if (percentage >= 90) return "Excellent! You're ready for IELTS/PTE! 🏆";
+                if (percentage >= 70) return "Great job! Keep practicing for even better results! 🌟";
+                if (percentage >= 50) return "Good work! Review the missed words and try again! 📚";
+                return "Keep studying! Practice makes perfect! 💪";
+            }
+
+            render() {
+                const container = document.getElementById('gameContent');
+                
+                if (this.gameComplete) {
+                    container.innerHTML = this.renderCompletionScreen();
+                } else {
+                    container.innerHTML = this.renderGameScreen();
+                }
+            }
+
+            renderCompletionScreen() {
+                return `
+                    <div class="completion-screen">
+                        <div class="trophy">🏆</div>
+                        <h2 class="completion-title">Game Complete!</h2>
+                        <div class="score-summary">
+                            <div class="final-score">${this.score}/${this.vocabularyQuestions.length}</div>
+                            <div class="score-details">
+                                <div class="score-detail">Accuracy: ${Math.round((this.score / this.vocabularyQuestions.length) * 100)}%</div>
+                                <div class="score-detail">Best Streak: ${this.bestStreak} correct answers</div>
+                            </div>
+                            <div class="score-message">${this.getScoreMessage()}</div>
+                        </div>
+                        <button class="btn" onclick="game.resetGame()">
+                            🔄 Play Again
+                        </button>
+                    </div>
+                `;
+            }
+
+            renderGameScreen() {
+                const currentQ = this.vocabularyQuestions[this.currentQuestion];
+                const progress = ((this.currentQuestion + 1) / this.vocabularyQuestions.length) * 100;
+
+                return `
+                    <div class="header">
+                        <h1 class="title">📚 IELTS & PTE Vocabulary</h1>
+                        <div class="stats">
+                            <div class="stat-item">🎯 Streak: ${this.streak}</div>
+                            <div class="stat-item">${this.currentQuestion + 1}/${this.vocabularyQuestions.length}</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${progress}%"></div>
+                    </div>
+
+                    <div class="question-card">
+                        <div class="category-badge">${currentQ.category}</div>
+                        <h2 class="word">${currentQ.word}</h2>
+                        <p class="definition">${currentQ.definition}</p>
+                        <div class="example">
+                            <div class="example-text">
+                                <strong>Example:</strong> ${currentQ.sentence}
+                            </div>
+                        </div>
+
+                        <div class="options">
+                            ${currentQ.options.map((option, index) => {
+                                let optionClass = 'option';
+                                if (this.showResult) {
+                                    optionClass += ' disabled';
+                                    if (index === currentQ.correct) {
+                                        optionClass += ' correct';
+                                    } else if (index === this.selectedAnswer && index !== currentQ.correct) {
+                                        optionClass += ' incorrect';
+                                    }
+                                }
+                                
+                                return `
+                                    <div class="${optionClass}" onclick="game.handleAnswerSelect(${index})">
+                                        <span class="option-letter">${String.fromCharCode(65 + index)}.</span>
+                                        ${option}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    ${this.showResult ? `
+                        <div class="result-message">
+                            <div class="result-badge ${this.selectedAnswer === currentQ.correct ? 'correct' : 'incorrect'}">
+                                ${this.selectedAnswer === currentQ.correct ? '✓ Correct!' : '✗ Incorrect'}
+                            </div>
+                            <div>
+                                <button class="btn" onclick="game.nextQuestion()">
+                                    ${this.currentQuestion < this.vocabularyQuestions.length - 1 ? 'Next Question' : 'View Results'} →
+                                </button>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <div class="current-score">
+                        Current Score: <strong>${this.score}/${this.currentQuestion + (this.showResult ? 1 : 0)}</strong>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize the game
+        const game = new VocabularyGame();
+    </script>
+</body>
+</html>
